@@ -2,8 +2,11 @@
 #include "event.h"
 
 static CVReturn animation_frame_callback(CVDisplayLinkRef display_link, const CVTimeStamp* now, const CVTimeStamp* output_time, CVOptionFlags flags, CVOptionFlags* flags_out, void* context) {
-  struct event event = { (void*)output_time->hostTime, ANIMATOR_REFRESH };
-  event_post(&event);
+  uint64_t hostTime = output_time->hostTime;
+  dispatch_async(dispatch_get_main_queue(), ^{
+    struct event event = { (void*)hostTime, ANIMATOR_REFRESH };
+    event_post(&event);
+  });
   return kCVReturnSuccess;
 }
 
